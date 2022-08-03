@@ -2,31 +2,45 @@ import tkinter as tk
 from tkinter import ttk
 from database import *
 
-window = tk.Tk()
-window.title('Семеный бюджет')
-window.geometry('600x500')
-window.resizable(False, False)
 
-table_list = tk.Frame(window, width=600, height=300)
+class App(tk.Tk):
 
-table_list.place(x=0, y=300)
-heads = get_columns_name()
-table = ttk.Treeview(table_list, show='headings')
-table['columns'] = heads
+    def __init__(self):
+        super().__init__()
+        self.title('Семеный бюджет')
+        self.geometry('600x500')
+        self.resizable(False, False)
+        self.put_frames()
 
-for header in heads:
-    table.heading(header, text=header,anchor='center')
-    table.column(header, anchor='center')
-    table.column(header, width=150)
+    def put_frames(self):
+        self.table_frame = TableFrame(self).place(x=0, y=300)
 
 
-print(get_date())
-for row in get_date():
-    table.insert('', 0, values=row)
-    print(row)
+class TableFrame(tk.Frame):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.put_widges()
+
+    def put_widges(self):
+        heads = get_columns_name()
+        table = ttk.Treeview(self, show='headings')
+        table['columns'] = heads
+
+        for header in heads:
+            table.heading(header, text=header, anchor='center')
+            table.column(header, anchor='center')
+            table.column(header, width=150)
+
+        for row in get_date():
+            print(row)
+            table.insert('', 0, values=row)
+
+        scroll_pane = ttk.Scrollbar(self, command=table.yview)
+        table.configure(yscrollcommand=scroll_pane.set)
+        scroll_pane.pack(side=tk.RIGHT, fill=tk.Y)
+        table.pack(expand=tk.YES, fill=tk.BOTH)
 
 
-
-table.pack(expand=tk.YES, fill=tk.BOTH)
-
-window.mainloop()
+app = App()
+app.mainloop()

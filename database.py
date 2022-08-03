@@ -24,16 +24,11 @@ def get_date():
     cursor.execute('''SELECT * FROM costs''')
     result = cursor.fetchall()
     lst = []
-    print(result)
     for row in result:
-        for rows in row:
-            lst.append(str(rows))
-    lst = [tuple(lst)]
+        lst.append(tuple([str(rows) for rows in row]))
     return lst
         
         
 conn = connect_to_sql(config['host'], config['username'], config['password'],
                       config['name_database'])
 cursor = conn.cursor()
-
-get_date()
