@@ -20,7 +20,7 @@ def get_columns_name():
     list = [row[0] for row in result]
     return list
 
-def get_date():
+def get_costs():
     cursor.execute('''SELECT * FROM costs''')
     result = cursor.fetchall()
     lst = []
