@@ -38,6 +38,7 @@ def insert_data(amount, date, category_id):
     print(data)
     cursor.execute(sql, data)
     conn.commit()
+    return True
 
 
 def get_columns_name():

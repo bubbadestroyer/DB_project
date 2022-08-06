@@ -18,6 +18,14 @@ class App(tk.Tk):
     def put_frames(self):
         self.data_frame = DataFrame(self).place(x=0, y=0)
         self.table_frame = TableFrame(self).place(x=0, y=300)
+        
+        
+    def refresh(self):
+        all_frames = [f for f in self.children]
+        for f_name in all_frames:
+            self.nametowidget(f_name).destroy()
+        self.put_frames()
+            
 
 
 class TableFrame(tk.Frame):
@@ -56,7 +64,8 @@ class DataFrame(tk.Frame):
         date = self.date_label_value.get()
         date = f'{date[6:10]}-{date[3:5]}-{date[:2]}'
         category_id = self.category_label_value.get()
-        insert_data(amount, date, get_categories_from_category(category_id))
+        if insert_data(amount, date, get_categories_from_category(category_id)):
+            self.master.refresh()
 
     def put_widges(self):
         self.amount_label_text = ttk.Label(self, text='Сумма')
