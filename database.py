@@ -1,6 +1,8 @@
+from multiprocessing import connection
 import mysql.connector
 from mysql.connector import Error
 from config import config
+
 
 def connect_to_sql(hostname, username, password, name):
     try:
@@ -14,13 +16,28 @@ def connect_to_sql(hostname, username, password, name):
     return connection_db
 
 
+def get_categories_from_category(category_id):
+    sql = '''SELECT id FROM categories WHERE category = %s'''
+    cursor.execute(sql, [category_id])
+    result = cursor.fetchall()
+    return result[0][0]
+
+
 def get_categories():
     cursor.execute('''SELECT category FROM categories''')
     result = cursor.fetchall()
     lst = []
     for row in result:
         lst.append(row[0])
-    return lst 
+    return lst
+
+
+def insert_data(amount, date, category_id):
+    sql = '''INSERT INTO costs (amount, date_of_operation, categories_id) VALUES (%s, %s, %s)'''
+    data = [amount, date, category_id]
+    print(data)
+    cursor.execute(sql, data)
+    conn.commit()
 
 
 def get_columns_name():
@@ -29,6 +46,7 @@ def get_columns_name():
     list = [row[0] for row in result]
     return list
 
+
 def get_costs():
     cursor.execute('''SELECT * FROM costs''')
     result = cursor.fetchall()
@@ -36,10 +54,8 @@ def get_costs():
     for row in result:
         lst.append(tuple([str(rows) for rows in row]))
     return lst
-        
-        
+
+
 conn = connect_to_sql(config['host'], config['username'], config['password'],
                       config['name_database'])
-cursor = conn.cursor()
-
-get_categories()
+cursor = conn.cursor(buffered=True)
