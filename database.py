@@ -42,20 +42,25 @@ def insert_data(amount, date, category_id):
 
 
 def get_columns_name():
-    cursor.execute('''SHOW COLUMNS FROM costs''')
+    cursor.execute(
+        '''SELECT DISTINCT(COLUMN_NAME) FROM information_schema.columns
+WHERE Table_Name="costs" OR Table_name="categories"
+ORDER BY LENGTH(COLUMN_NAME)''')
     result = cursor.fetchall()
-    list = [row[0] for row in result]
-    return list
+    lst = [row[0] for row in result if row[0] != 'categories_id']
+    print(lst)
+    return lst
 
 
 def get_costs():
-    cursor.execute('''SELECT * FROM costs''')
+    cursor.execute(
+        '''SELECT costs.id, amount, category, date_of_operation  FROM costs INNER JOIN categories ON costs.categories_id = categories.id;'''
+    )
     result = cursor.fetchall()
     lst = []
     for row in result:
         lst.append(tuple([str(rows) for rows in row]))
     return lst
-
 
 
 def get_sum_amount():
@@ -67,6 +72,3 @@ def get_sum_amount():
 conn = connect_to_sql(config['host'], config['username'], config['password'],
                       config['name_database'])
 cursor = conn.cursor(buffered=True)
-
-
-get_sum_amount()

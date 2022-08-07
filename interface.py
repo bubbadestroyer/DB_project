@@ -32,19 +32,19 @@ class StatFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.put_widges()
-        
+
     def put_widges(self):
         self.sum_amount_text = ttk.Label(self, text='Сумма')
         self.sum_amount_value = ttk.Label(self, text=get_sum_amount())
 
         self.sum_amount_text.grid(row=0,
-                                    column=0,
-                                    sticky='w',
-                                    cnf=self.master.conf)
+                                  column=0,
+                                  sticky='w',
+                                  cnf=self.master.conf)
         self.sum_amount_value.grid(row=0,
-                                    column=1,
-                                    sticky='e',
-                                    cnf=self.master.conf)
+                                   column=1,
+                                   sticky='e',
+                                   cnf=self.master.conf)
 
 
 class TableFrame(tk.Frame):
