@@ -57,6 +57,16 @@ def get_costs():
     return lst
 
 
+
+def get_sum_amount():
+    cursor.execute('''SELECT SUM(amount) FROM costs''')
+    result = cursor.fetchall()
+    return result[0][0]
+
+
 conn = connect_to_sql(config['host'], config['username'], config['password'],
                       config['name_database'])
 cursor = conn.cursor(buffered=True)
+
+
+get_sum_amount()
