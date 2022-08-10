@@ -54,7 +54,7 @@ ORDER BY LENGTH(COLUMN_NAME)''')
 
 def get_costs():
     cursor.execute(
-        '''SELECT costs.id, amount, category, date_of_operation  FROM costs INNER JOIN categories ON costs.categories_id = categories.id;'''
+        '''SELECT costs.id, amount, category, date_of_operation  FROM costs INNER JOIN categories ON costs.categories_id = categories.id'''
     )
     result = cursor.fetchall()
     lst = []
@@ -65,6 +65,14 @@ def get_costs():
 
 def get_sum_amount():
     cursor.execute('''SELECT SUM(amount) FROM costs''')
+    result = cursor.fetchall()
+    return result[0][0]
+
+
+def get_most_popular_category():
+    cursor.execute(
+        '''SELECT category FROM costs INNER JOIN categories ON costs.categories_id = categories.id GROUP BY categories_id ORDER BY COUNT(*) DESC LIMIT 1'''
+    )
     result = cursor.fetchall()
     return result[0][0]
 

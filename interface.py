@@ -34,8 +34,12 @@ class StatFrame(tk.Frame):
         self.put_widges()
 
     def put_widges(self):
-        self.sum_amount_text = ttk.Label(self, text='Сумма')
+        self.sum_amount_text = ttk.Label(self, text='Общие расходы')
         self.sum_amount_value = ttk.Label(self, text=get_sum_amount())
+        self.most_popular_category_text = ttk.Label(
+            self, text='Самая популярная категория')
+        self.most_popular_category_value = ttk.Label(
+            self, text=get_most_popular_category())
 
         self.sum_amount_text.grid(row=0,
                                   column=0,
@@ -45,6 +49,14 @@ class StatFrame(tk.Frame):
                                    column=1,
                                    sticky='e',
                                    cnf=self.master.conf)
+        self.most_popular_category_text.grid(row=1,
+                                             column=0,
+                                             sticky='w',
+                                             cnf=self.master.conf)
+        self.most_popular_category_value.grid(row=1,
+                                              column=1,
+                                              sticky='e',
+                                              cnf=self.master.conf)
 
 
 class TableFrame(tk.Frame):
