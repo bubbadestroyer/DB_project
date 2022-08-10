@@ -20,12 +20,33 @@ class App(tk.Tk):
         self.data_frame = DataFrame(self).place(x=0, y=100)
         self.table_frame = TableFrame(self).place(x=0, y=300)
         self.stat_frame = StatFrame(self).place(x=300, y=100)
+        self.Icons_frame = IconsFrame(self).place(x=0, y=0)
 
     def refresh(self):
         all_frames = [f for f in self.children]
         for f_name in all_frames:
             self.nametowidget(f_name).destroy()
         self.put_frames()
+
+
+class IconsFrame(tk.Frame):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.put_widges()
+
+    def put_widges(self):
+        self.frame = tk.Frame(bg='#d7d8e0', bd=2)
+        self.frame.pack(side=tk.TOP, fill=tk.X)
+
+        self.add_income = tk.PhotoImage(file='diagramma.gif')
+        btn_add_income = tk.Button(self.frame,
+                                   text='Отобразить диаграммой',
+                                   compound=tk.TOP,
+                                   image=self.add_income,
+                                   bd=0,
+                                   bg='#d7d8e0')
+        btn_add_income.pack(side=tk.LEFT)
 
 
 class StatFrame(tk.Frame):
@@ -54,7 +75,7 @@ class StatFrame(tk.Frame):
 
         self.sum_amount_text.grid(row=0,
                                   column=0,
-                                  sticky='w ',
+                                  sticky='w',
                                   cnf=self.master.conf)
         self.sum_amount_value.grid(row=0,
                                    column=1,
