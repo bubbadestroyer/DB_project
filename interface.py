@@ -3,6 +3,8 @@ from tkinter import Button, ttk
 from unicodedata import category
 from database import *
 from tkcalendar import DateEntry, Calendar
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class App(tk.Tk):
@@ -18,7 +20,7 @@ class App(tk.Tk):
 
     def put_frames(self):
         self.data_frame = DataFrame(self).place(x=0, y=100)
-        self.table_frame = TableFrame(self).place(x=0, y=300)
+        self.table_frame = TableFrame(self).place(x=0, y=275)
         self.stat_frame = StatFrame(self).place(x=300, y=100)
         self.Icons_frame = IconsFrame(self).place(x=0, y=0)
 
@@ -45,8 +47,17 @@ class IconsFrame(tk.Frame):
                                    compound=tk.TOP,
                                    image=self.add_income,
                                    bd=0,
+                                   command=self.abc,
                                    bg='#d7d8e0')
         btn_add_income.pack(side=tk.LEFT)
+
+    def abc(self):
+        fig = plt.figure(figsize=(10, 4))
+        ax = fig.add_subplot()
+        value, labels = get_data_for_diagramm()
+        ax.pie(value, labels=labels, autopct='%1.1f', shadow=True)
+        ax.grid()
+        plt.show()
 
 
 class StatFrame(tk.Frame):
