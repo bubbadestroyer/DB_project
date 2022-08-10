@@ -43,12 +43,10 @@ def insert_data(amount, date, category_id):
 
 def get_columns_name():
     cursor.execute(
-        '''SELECT DISTINCT(COLUMN_NAME) FROM information_schema.columns
-WHERE Table_Name="costs" OR Table_name="categories"
+        '''SELECT distinct(COLUMN_NAME)  FROM information_schema.columns WHERE (Table_Name="categories" OR Table_name="costs") and COLUMN_NAME != 'categories_id'
 ORDER BY LENGTH(COLUMN_NAME)''')
     result = cursor.fetchall()
-    lst = [row[0] for row in result if row[0] != 'categories_id']
-    print(lst)
+    lst = [row[0] for row in result]
     return lst
 
 
