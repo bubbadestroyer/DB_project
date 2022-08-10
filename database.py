@@ -17,14 +17,17 @@ def connect_to_sql(hostname, username, password, name):
 
 
 def get_categories_from_category(category_id):
-    sql = '''SELECT id FROM categories WHERE category = %s'''
+    sql = '''SELECT id 
+            FROM categories 
+            WHERE category = %s'''
     cursor.execute(sql, [category_id])
     result = cursor.fetchall()
     return result[0][0]
 
 
 def get_categories():
-    cursor.execute('''SELECT category FROM categories''')
+    cursor.execute('''SELECT category 
+                   FROM categories''')
     result = cursor.fetchall()
     lst = []
     for row in result:
@@ -33,7 +36,8 @@ def get_categories():
 
 
 def insert_data(amount, date, category_id):
-    sql = '''INSERT INTO costs (amount, date_of_operation, categories_id) VALUES (%s, %s, %s)'''
+    sql = '''INSERT INTO costs (amount, date_of_operation, categories_id) 
+            VALUES (%s, %s, %s)'''
     data = [amount, date, category_id]
     print(data)
     cursor.execute(sql, data)
@@ -42,18 +46,22 @@ def insert_data(amount, date, category_id):
 
 
 def get_columns_name():
-    cursor.execute(
-        '''SELECT distinct(COLUMN_NAME)  FROM information_schema.columns WHERE (Table_Name="categories" OR Table_name="costs") and COLUMN_NAME != 'categories_id'
-ORDER BY LENGTH(COLUMN_NAME)''')
+    cursor.execute('''SELECT distinct(COLUMN_NAME)  
+        FROM information_schema.columns 
+        WHERE (Table_Name="categories" OR Table_name="costs") and COLUMN_NAME != 'categories_id'
+        ORDER BY LENGTH(COLUMN_NAME)''')
     result = cursor.fetchall()
     lst = [row[0] for row in result]
     return lst
 
 
 def get_costs():
-    cursor.execute(
-        '''SELECT costs.id, amount, category, date_of_operation  FROM costs INNER JOIN categories ON costs.categories_id = categories.id ORDER BY id'''
-    )
+    cursor.execute('''SELECT costs.id, amount, category, date_of_operation  
+        FROM costs 
+        INNER JOIN 
+        categories 
+        ON costs.categories_id = categories.id 
+        ORDER BY id''')
     result = cursor.fetchall()
     lst = []
     for row in result:
@@ -62,25 +70,44 @@ def get_costs():
 
 
 def get_sum_amount():
-    cursor.execute('''SELECT SUM(amount) FROM costs''')
+    cursor.execute('''SELECT SUM(amount) 
+                   FROM costs''')
     result = cursor.fetchall()
     return result[0][0]
 
 
 def get_most_popular_category():
-    cursor.execute(
-        '''SELECT category FROM costs INNER JOIN categories ON costs.categories_id = categories.id GROUP BY categories_id ORDER BY COUNT(*) DESC LIMIT 1'''
-    )
+    cursor.execute('''SELECT category 
+                    FROM costs 
+                    INNER JOIN categories 
+                    ON costs.categories_id = categories.id 
+                    GROUP BY categories_id 
+                    ORDER BY COUNT(*) DESC 
+                    LIMIT 1''')
     result = cursor.fetchall()
     return result[0][0]
 
 
 def get_avg_amount():
-    cursor.execute('''SELECT ROUND(AVG(amount),2) FROM costs''')
+    cursor.execute('''SELECT ROUND(AVG(amount),2) 
+                   FROM costs''')
     result = cursor.fetchall()
     return result[0][0]
+
+
+def get_data_for_diagramm():
+    cursor.execute('''SELECT SUM(amount), category 
+                    FROM costs
+                    INNER JOIN categories ON costs.categories_id = categories.id
+                    GROUP by category''')
+    result = cursor.fetchall()
+    value = [row[0] for row in result]
+    labels = [row[1] for row in result]
+    return value, labels
 
 
 conn = connect_to_sql(config['host'], config['username'], config['password'],
                       config['name_database'])
 cursor = conn.cursor(buffered=True)
+
+get_data_for_diagramm()
