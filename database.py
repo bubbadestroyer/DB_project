@@ -39,7 +39,6 @@ def insert_data(amount, date, category_id):
     sql = '''INSERT INTO costs (amount, date_of_operation, categories_id) 
             VALUES (%s, %s, %s)'''
     data = [amount, date, category_id]
-    print(data)
     cursor.execute(sql, data)
     conn.commit()
     return True
@@ -95,10 +94,10 @@ def get_avg_amount():
     return result[0][0]
 
 
-def get_data_for_diagramm():
-    cursor.execute('''SELECT SUM(amount), category 
-                    FROM costs
-                    INNER JOIN categories ON costs.categories_id = categories.id
+def get_data_for_diagramm(table_name):
+    cursor.execute(f'''SELECT SUM(amount), category 
+                    FROM {table_name}
+                    INNER JOIN categories ON {table_name}.categories_id = categories.id
                     GROUP by category''')
     result = cursor.fetchall()
     value = [row[0] for row in result]
@@ -109,5 +108,3 @@ def get_data_for_diagramm():
 conn = connect_to_sql(config['host'], config['username'], config['password'],
                       config['name_database'])
 cursor = conn.cursor(buffered=True)
-
-get_data_for_diagramm()

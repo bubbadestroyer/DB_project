@@ -1,28 +1,53 @@
 import tkinter as tk
-from tkinter import Button, ttk
-from unicodedata import category
+from tkinter import ttk
 from database import *
-from tkcalendar import DateEntry, Calendar
+from tkcalendar import DateEntry
 import matplotlib.pyplot as plt
-import pandas as pd
 
 
 class App(tk.Tk):
 
     def __init__(self):
         super().__init__()
+        self.init_main()
+        self.title('Семеный бюджет')
+        self.geometry('400x300')
+
+    def init_main(self):
+        toolbar = tk.Frame(bd=2)
+        toolbar.pack(side=tk.TOP, fill=tk.X)
+
+        self.add_img = tk.PhotoImage(file="minus.gif")
+        btn_open_dialog = tk.Button(toolbar,
+                                    text='Посмотреть расходы',
+                                    command=self.open_dialog,
+                                    bd=0,
+                                    compound=tk.TOP,
+                                    image=self.add_img)
+        btn_open_dialog.pack(side=tk.LEFT)
+
+    def open_dialog(self):
+        a = CostsFrame(self)
+        a.grab_set()
+
+
+class CostsFrame(tk.Toplevel):
+
+    def __init__(self, parent):
+        super().__init__(parent)
         self.title('Семеный бюджет')
         self.geometry('600x500')
         self.resizable(False, False)
         self.conf = {'padx': (10, 30), 'pady': 10}
         self.font = 'font 10 bold'
+        self.table_name = 'costs'
         self.put_frames()
 
     def put_frames(self):
+        self.icons_frame = IconsFrame(self).place(x=0, y=0)
         self.data_frame = DataFrame(self).place(x=0, y=100)
         self.table_frame = TableFrame(self).place(x=0, y=275)
         self.stat_frame = StatFrame(self).place(x=300, y=100)
-        self.Icons_frame = IconsFrame(self).place(x=0, y=0)
 
     def refresh(self):
         all_frames = [f for f in self.children]
@@ -38,7 +63,7 @@ class IconsFrame(tk.Frame):
         self.put_widges()
 
     def put_widges(self):
-        self.frame = tk.Frame(bg='#d7d8e0', bd=2)
+        self.frame = tk.Frame(self, bd=2)
         self.frame.pack(side=tk.TOP, fill=tk.X)
 
         self.add_income = tk.PhotoImage(file='diagramma.gif')
@@ -47,15 +72,16 @@ class IconsFrame(tk.Frame):
                                    compound=tk.TOP,
                                    image=self.add_income,
                                    bd=0,
-                                   command=self.abc,
-                                   bg='#d7d8e0')
+                                   command=self.create_diagram)
         btn_add_income.pack(side=tk.LEFT)
 
-    def abc(self):
-        fig = plt.figure(figsize=(10, 4))
+    def create_diagram(self):
+        fig = plt.figure(figsize=(6, 4))
         ax = fig.add_subplot()
-        value, labels = get_data_for_diagramm()
+
+        value, labels = get_data_for_diagramm(self.master.table_name)
         ax.pie(value, labels=labels, autopct='%1.1f', shadow=True)
+
         ax.grid()
         plt.show()
 
