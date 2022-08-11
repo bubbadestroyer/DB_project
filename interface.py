@@ -1,3 +1,4 @@
+from sys import flags
 import tkinter as tk
 from tkinter import ttk
 from database import *
@@ -17,30 +18,45 @@ class App(tk.Tk):
         toolbar = tk.Frame(bd=2)
         toolbar.pack(side=tk.TOP, fill=tk.X)
 
-        self.add_img = tk.PhotoImage(file="minus.gif")
-        btn_open_dialog = tk.Button(toolbar,
-                                    text='Посмотреть расходы',
-                                    command=self.open_dialog,
-                                    bd=0,
-                                    compound=tk.TOP,
-                                    image=self.add_img)
-        btn_open_dialog.pack(side=tk.LEFT)
+        self.income_img = tk.PhotoImage(file="plus.gif")
+        btn_open_income_dialog = tk.Button(toolbar,
+                                           text='Посмотреть доходы',
+                                           command=self.create_income_frame,
+                                           bd=0,
+                                           compound=tk.TOP,
+                                           image=self.income_img)
+        btn_open_income_dialog.pack(side=tk.LEFT)
 
-    def open_dialog(self):
-        a = CostsFrame(self)
+        self.costs_img = tk.PhotoImage(file="minus.gif")
+        btn_open_costs_dialog = tk.Button(toolbar,
+                                          text='Посмотреть расходы',
+                                          command=self.create_costs_frame,
+                                          bd=0,
+                                          compound=tk.TOP,
+                                          image=self.costs_img)
+        btn_open_costs_dialog.pack(side=tk.LEFT)
+
+    def create_costs_frame(self):
+        flag = 'costs'
+        a = MainFrame(self, flag)
+        a.grab_set()
+
+    def create_income_frame(self):
+        flag = 'income'
+        a = MainFrame(self, flag)
         a.grab_set()
 
 
-class CostsFrame(tk.Toplevel):
+class MainFrame(tk.Toplevel):
 
-    def __init__(self, parent):
+    def __init__(self, parent, flag):
         super().__init__(parent)
         self.title('Семеный бюджет')
         self.geometry('600x500')
         self.resizable(False, False)
         self.conf = {'padx': (10, 30), 'pady': 10}
         self.font = 'font 10 bold'
-        self.table_name = 'costs'
+        self.table_name = flag
         self.put_frames()
 
     def put_frames(self):
@@ -93,47 +109,59 @@ class StatFrame(tk.Frame):
         self.put_widges()
 
     def put_widges(self):
-        self.sum_amount_text = ttk.Label(self,
-                                         text='Общие расходы',
-                                         font=self.master.font)
-        self.sum_amount_value = ttk.Label(self,
-                                          text=get_sum_amount(),
-                                          font=self.master.font)
+        if self.master.table_name == 'costs':
+            self.sum_amount_text = ttk.Label(self,
+                                             text='Общие расходы',
+                                             font=self.master.font)
+            self.avg_amount_text = ttk.Label(self,
+                                             text='Средняя сумма расходов',
+                                             font=self.master.font)
+        else:
+            self.sum_amount_text = ttk.Label(self,
+                                             text='Общие доходы',
+                                             font=self.master.font)
+            self.avg_amount_text = ttk.Label(self,
+                                             text='Средняя сумма доходов',
+                                             font=self.master.font)
         self.most_popular_category_text = ttk.Label(
             self, text='Самая популярная категория', font=self.master.font)
-        self.most_popular_category_value = ttk.Label(
-            self, text=get_most_popular_category(), font=self.master.font)
-        self.avg_amount_text = ttk.Label(self,
-                                         text='Средняя сумма расходов',
-                                         font=self.master.font)
-        self.avg_amount_value = ttk.Label(self,
-                                          text=get_avg_amount(),
+        self.sum_amount_value = ttk.Label(self,
+                                          text=get_sum_amount(
+                                              self.master.table_name),
                                           font=self.master.font)
+        self.avg_amount_value = ttk.Label(self,
+                                          text=get_avg_amount(
+                                              self.master.table_name),
+                                          font=self.master.font)
+        self.most_popular_category_value = ttk.Label(
+            self,
+            text=get_most_popular_category(self.master.table_name),
+            font=self.master.font)
 
         self.sum_amount_text.grid(row=0,
                                   column=0,
                                   sticky='w',
                                   cnf=self.master.conf)
-        self.sum_amount_value.grid(row=0,
-                                   column=1,
-                                   sticky='e',
-                                   cnf=self.master.conf)
-        self.most_popular_category_text.grid(row=2,
-                                             column=0,
-                                             sticky='w',
-                                             cnf=self.master.conf)
-        self.most_popular_category_value.grid(row=2,
-                                              column=1,
-                                              sticky='e',
-                                              cnf=self.master.conf)
         self.avg_amount_text.grid(row=1,
                                   column=0,
                                   sticky='w',
                                   cnf=self.master.conf)
+        self.most_popular_category_text.grid(row=2,
+                                             column=0,
+                                             sticky='w',
+                                             cnf=self.master.conf)
+        self.sum_amount_value.grid(row=0,
+                                   column=1,
+                                   sticky='e',
+                                   cnf=self.master.conf)
         self.avg_amount_value.grid(row=1,
                                    column=1,
                                    sticky='e',
                                    cnf=self.master.conf)
+        self.most_popular_category_value.grid(row=2,
+                                              column=1,
+                                              sticky='e',
+                                              cnf=self.master.conf)
 
 
 class TableFrame(tk.Frame):
@@ -143,7 +171,7 @@ class TableFrame(tk.Frame):
         self.put_widges()
 
     def put_widges(self):
-        heads = get_columns_name()
+        heads = get_columns_name(self.master.table_name)
         table = ttk.Treeview(self, show='headings')
         table['columns'] = heads
 
@@ -152,7 +180,7 @@ class TableFrame(tk.Frame):
             table.column(header, anchor='center')
             table.column(header, width=145)
 
-        for row in get_costs():
+        for row in get_costs(self.master.table_name):
             table.insert('', tk.END, values=row)
 
         scroll_pane = ttk.Scrollbar(self, command=table.yview)
@@ -172,7 +200,7 @@ class DataFrame(tk.Frame):
         date = self.date_label_value.get()
         date = f'{date[6:10]}-{date[3:5]}-{date[:2]}'
         category_id = self.category_label_value.get()
-        if insert_data(amount, date,
+        if insert_data(self.master.table_name, amount, date,
                        get_categories_from_category(category_id)):
             self.master.refresh()
 

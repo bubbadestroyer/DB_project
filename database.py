@@ -35,8 +35,8 @@ def get_categories():
     return lst
 
 
-def insert_data(amount, date, category_id):
-    sql = '''INSERT INTO costs (amount, date_of_operation, categories_id) 
+def insert_data(table_name, amount, date, category_id):
+    sql = f'''INSERT INTO {table_name} (amount, date_of_operation, categories_id) 
             VALUES (%s, %s, %s)'''
     data = [amount, date, category_id]
     cursor.execute(sql, data)
@@ -44,22 +44,22 @@ def insert_data(amount, date, category_id):
     return True
 
 
-def get_columns_name():
-    cursor.execute('''SELECT distinct(COLUMN_NAME)  
+def get_columns_name(table_name):
+    cursor.execute(f'''SELECT distinct(COLUMN_NAME)  
         FROM information_schema.columns 
-        WHERE (Table_Name="categories" OR Table_name="costs") and COLUMN_NAME != 'categories_id'
+        WHERE (Table_Name="categories" OR Table_name="{table_name}") and COLUMN_NAME != 'categories_id'
         ORDER BY LENGTH(COLUMN_NAME)''')
     result = cursor.fetchall()
     lst = [row[0] for row in result]
     return lst
 
 
-def get_costs():
-    cursor.execute('''SELECT costs.id, amount, category, date_of_operation  
-        FROM costs 
+def get_costs(table_name):
+    cursor.execute(f'''SELECT {table_name}.id, amount, category, date_of_operation  
+        FROM {table_name}
         INNER JOIN 
         categories 
-        ON costs.categories_id = categories.id 
+        ON {table_name}.categories_id = categories.id 
         ORDER BY id''')
     result = cursor.fetchall()
     lst = []
@@ -68,18 +68,18 @@ def get_costs():
     return lst
 
 
-def get_sum_amount():
-    cursor.execute('''SELECT SUM(amount) 
-                   FROM costs''')
+def get_sum_amount(table_name):
+    cursor.execute(f'''SELECT SUM(amount) 
+                   FROM {table_name}''')
     result = cursor.fetchall()
     return result[0][0]
 
 
-def get_most_popular_category():
-    cursor.execute('''SELECT category 
-                    FROM costs 
+def get_most_popular_category(table_name):
+    cursor.execute(f'''SELECT category 
+                    FROM {table_name} 
                     INNER JOIN categories 
-                    ON costs.categories_id = categories.id 
+                    ON {table_name}.categories_id = categories.id 
                     GROUP BY categories_id 
                     ORDER BY COUNT(*) DESC 
                     LIMIT 1''')
@@ -87,9 +87,9 @@ def get_most_popular_category():
     return result[0][0]
 
 
-def get_avg_amount():
-    cursor.execute('''SELECT ROUND(AVG(amount),2) 
-                   FROM costs''')
+def get_avg_amount(table_name):
+    cursor.execute(f'''SELECT ROUND(AVG(amount),2) 
+                   FROM {table_name}''')
     result = cursor.fetchall()
     return result[0][0]
 
