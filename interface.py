@@ -1,4 +1,3 @@
-from sys import flags
 import tkinter as tk
 from tkinter import ttk
 from database import *
@@ -60,9 +59,10 @@ class MainFrame(tk.Toplevel):
         self.put_frames()
 
     def put_frames(self):
-        self.icons_frame = IconsFrame(self).place(x=0, y=0)
+        self.table_frame = TableFrame(self)
+        self.table_frame.place(x=0, y=275)
+        self.icons_frame = IconsFrame(self, self.table_frame).place(x=0, y=0)
         self.data_frame = DataFrame(self).place(x=0, y=100)
-        self.table_frame = TableFrame(self).place(x=0, y=275)
         self.stat_frame = StatFrame(self).place(x=300, y=100)
 
     def refresh(self):
@@ -74,22 +74,32 @@ class MainFrame(tk.Toplevel):
 
 class IconsFrame(tk.Frame):
 
-    def __init__(self, parent):
+    def __init__(self, parent, table_frame):
         super().__init__(parent)
+        self.table_frame = table_frame
         self.put_widges()
 
     def put_widges(self):
         self.frame = tk.Frame(self, bd=2)
         self.frame.pack(side=tk.TOP, fill=tk.X)
 
-        self.add_income = tk.PhotoImage(file='diagramma.gif')
-        btn_add_income = tk.Button(self.frame,
-                                   text='Отобразить диаграммой',
-                                   compound=tk.TOP,
-                                   image=self.add_income,
-                                   bd=0,
-                                   command=self.create_diagram)
-        btn_add_income.pack(side=tk.LEFT)
+        self.delete_img = tk.PhotoImage(file='delete.gif')
+        btn_delete_value = tk.Button(self.frame,
+                                     text='Удалить значение',
+                                     compound=tk.TOP,
+                                     image=self.delete_img,
+                                     bd=0,
+                                     command=self.delete_value)
+        btn_delete_value.pack(side=tk.LEFT)
+
+        self.diagram_img = tk.PhotoImage(file='diagramma.gif')
+        btn_diagram = tk.Button(self.frame,
+                                text='Отобразить диаграммой',
+                                compound=tk.TOP,
+                                image=self.diagram_img,
+                                bd=0,
+                                command=self.create_diagram)
+        btn_diagram.pack(side=tk.LEFT)
 
     def create_diagram(self):
         fig = plt.figure(figsize=(6, 4))
@@ -100,6 +110,11 @@ class IconsFrame(tk.Frame):
 
         ax.grid()
         plt.show()
+        
+    def delete_value(self):
+        self.table_frame.delete()
+        self.master.refresh()
+            
 
 
 class StatFrame(tk.Frame):
@@ -172,21 +187,26 @@ class TableFrame(tk.Frame):
 
     def put_widges(self):
         heads = get_columns_name(self.master.table_name)
-        table = ttk.Treeview(self, show='headings')
-        table['columns'] = heads
+        self.table = ttk.Treeview(self, show='headings')
+        self.table['columns'] = heads
 
         for header in heads:
-            table.heading(header, text=header, anchor='center')
-            table.column(header, anchor='center')
-            table.column(header, width=145)
+            self.table.heading(header, text=header, anchor='center')
+            self.table.column(header, anchor='center')
+            self.table.column(header, width=145)
 
         for row in get_costs(self.master.table_name):
-            table.insert('', tk.END, values=row)
+            self.table.insert('', tk.END, values=row)
 
-        scroll_pane = ttk.Scrollbar(self, command=table.yview)
-        table.configure(yscrollcommand=scroll_pane.set)
+        scroll_pane = ttk.Scrollbar(self, command=self.table.yview)
+        self.table.configure(yscrollcommand=scroll_pane.set)
         scroll_pane.pack(side=tk.RIGHT, fill=tk.Y)
-        table.pack(expand=tk.YES, fill=tk.BOTH)
+        self.table.pack(expand=tk.YES, fill=tk.BOTH)
+        
+        
+    def delete(self):
+        for selection_item in self.table.selection():
+            delete_data(self.master.table_name, self.table.set(selection_item, '#1'))
 
 
 class DataFrame(tk.Frame):

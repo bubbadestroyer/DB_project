@@ -55,7 +55,8 @@ def get_columns_name(table_name):
 
 
 def get_costs(table_name):
-    cursor.execute(f'''SELECT {table_name}.id, amount, category, date_of_operation  
+    cursor.execute(
+        f'''SELECT {table_name}.id, amount, category, date_of_operation  
         FROM {table_name}
         INNER JOIN 
         categories 
@@ -103,6 +104,12 @@ def get_data_for_diagramm(table_name):
     value = [row[0] for row in result]
     labels = [row[1] for row in result]
     return value, labels
+
+def delete_data(table_name, id):
+    cursor.execute(f'''DELETE FROM {table_name} 
+                   WHERE id = {id}''')
+    conn.commit()
+
 
 
 conn = connect_to_sql(config['host'], config['username'], config['password'],
