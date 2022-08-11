@@ -16,18 +16,17 @@ def connect_to_sql(hostname, username, password, name):
     return connection_db
 
 
-def get_categories_from_category(category_id):
-    sql = '''SELECT id 
-            FROM categories 
-            WHERE category = %s'''
-    cursor.execute(sql, [category_id])
+def get_categories_from_category(category_id, table_name):
+    cursor.execute(f'''SELECT id 
+            FROM {table_name}_categories
+            WHERE category = "{category_id}"''')
     result = cursor.fetchall()
     return result[0][0]
 
 
-def get_categories():
-    cursor.execute('''SELECT category 
-                   FROM categories''')
+def get_categories(table_name):
+    cursor.execute(f'''SELECT category 
+                   FROM {table_name}_categories''')
     result = cursor.fetchall()
     lst = []
     for row in result:
@@ -47,7 +46,7 @@ def insert_data(table_name, amount, date, category_id):
 def get_columns_name(table_name):
     cursor.execute(f'''SELECT distinct(COLUMN_NAME)  
         FROM information_schema.columns 
-        WHERE (Table_Name="categories" OR Table_name="{table_name}") and COLUMN_NAME != 'categories_id'
+        WHERE (Table_Name="{table_name}_categories" OR Table_name="{table_name}") and COLUMN_NAME != 'categories_id'
         ORDER BY LENGTH(COLUMN_NAME)''')
     result = cursor.fetchall()
     lst = [row[0] for row in result]
@@ -59,8 +58,8 @@ def get_costs(table_name):
         f'''SELECT {table_name}.id, amount, category, date_of_operation  
         FROM {table_name}
         INNER JOIN 
-        categories 
-        ON {table_name}.categories_id = categories.id 
+        {table_name}_categories 
+        ON {table_name}.categories_id = {table_name}_categories.id 
         ORDER BY id''')
     result = cursor.fetchall()
     lst = []
@@ -79,8 +78,8 @@ def get_sum_amount(table_name):
 def get_most_popular_category(table_name):
     cursor.execute(f'''SELECT category 
                     FROM {table_name} 
-                    INNER JOIN categories 
-                    ON {table_name}.categories_id = categories.id 
+                    INNER JOIN {table_name}_categories 
+                    ON {table_name}.categories_id = {table_name}_categories.id 
                     GROUP BY categories_id 
                     ORDER BY COUNT(*) DESC 
                     LIMIT 1''')
@@ -98,12 +97,13 @@ def get_avg_amount(table_name):
 def get_data_for_diagramm(table_name):
     cursor.execute(f'''SELECT SUM(amount), category 
                     FROM {table_name}
-                    INNER JOIN categories ON {table_name}.categories_id = categories.id
+                    INNER JOIN {table_name}_categories ON {table_name}.categories_id = {table_name}_categories.id
                     GROUP by category''')
     result = cursor.fetchall()
     value = [row[0] for row in result]
     labels = [row[1] for row in result]
     return value, labels
+
 
 def delete_data(table_name, id):
     cursor.execute(f'''DELETE FROM {table_name} 
@@ -111,7 +111,7 @@ def delete_data(table_name, id):
     conn.commit()
 
 
-
 conn = connect_to_sql(config['host'], config['username'], config['password'],
                       config['name_database'])
 cursor = conn.cursor(buffered=True)
+

@@ -54,7 +54,7 @@ class MainFrame(tk.Toplevel):
         self.geometry('600x500')
         self.resizable(False, False)
         self.conf = {'padx': (10, 30), 'pady': 10}
-        self.font = 'font 10 bold'
+        self.font = 'font 8 bold'
         self.table_name = flag
         self.put_frames()
 
@@ -221,7 +221,7 @@ class DataFrame(tk.Frame):
         date = f'{date[6:10]}-{date[3:5]}-{date[:2]}'
         category_id = self.category_label_value.get()
         if insert_data(self.master.table_name, amount, date,
-                       get_categories_from_category(category_id)):
+                       get_categories_from_category(category_id,self.master.table_name)):
             self.master.refresh()
 
     def put_widges(self):
@@ -237,8 +237,7 @@ class DataFrame(tk.Frame):
                                              text='Категория',
                                              font=self.master.font)
         self.category_label_value = ttk.Combobox(self,
-                                                 values=get_categories(),
-                                                 font=self.master.font)
+                                                 values=get_categories(self.master.table_name))
         self.btn_send = ttk.Button(self,
                                    text='Отправить',
                                    command=self.get_data)
