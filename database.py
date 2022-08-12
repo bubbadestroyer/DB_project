@@ -53,7 +53,7 @@ def get_columns_name(table_name):
     return lst
 
 
-def get_costs(table_name):
+def get_table(table_name):
     cursor.execute(
         f'''SELECT {table_name}.id, amount, category, date_of_operation  
         FROM {table_name}

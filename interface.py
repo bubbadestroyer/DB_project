@@ -1,3 +1,4 @@
+from re import search
 import tkinter as tk
 from tkinter import ttk
 from database import *
@@ -83,6 +84,15 @@ class IconsFrame(tk.Frame):
         self.frame = tk.Frame(self, bd=2)
         self.frame.pack(side=tk.TOP, fill=tk.X)
 
+        self.search_img = tk.PhotoImage(file='search.gif')
+        btn_search = tk.Button(self.frame,
+                               text='Трата по категории',
+                               compound=tk.TOP,
+                               image=self.search_img,
+                               bd=0,
+                               command=self.open_search_dialog)
+        btn_search.pack(side=tk.LEFT)
+
         self.delete_img = tk.PhotoImage(file='delete.gif')
         btn_delete_value = tk.Button(self.frame,
                                      text='Удалить значение',
@@ -102,7 +112,7 @@ class IconsFrame(tk.Frame):
         btn_diagram.pack(side=tk.LEFT)
 
     def create_diagram(self):
-        fig = plt.figure(figsize=(6, 4))
+        fig = plt.figure(figsize=(7, 3))
         ax = fig.add_subplot()
 
         value, labels = get_data_for_diagramm(self.master.table_name)
@@ -110,11 +120,44 @@ class IconsFrame(tk.Frame):
 
         ax.grid()
         plt.show()
-        
+
     def delete_value(self):
         self.table_frame.delete()
         self.master.refresh()
-            
+
+    def open_search_dialog(self):
+        a = Search(self)
+        a.grab_set()
+
+
+class Search(tk.Toplevel):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.init_search()
+
+    def init_search(self):
+        self.title('Поиск')
+        self.geometry('300x100+400+300')
+        self.resizable(False, False)
+
+        self.label_search = tk.Label(self, text='Поиск')
+        self.label_search.place(x=50, y=20)
+
+        self.entry_search = ttk.Entry(self)
+        self.entry_search.place(x=105, y=20, width=150)
+
+        self.btn_cancel = ttk.Button(self,
+                                     text='Закрыть',
+                                     command=self.destroy)
+        self.btn_cancel.place(x=185, y=50)
+
+        self.btn_search = ttk.Button(self, text='Поиск',command=self.search_data)
+        self.btn_search.place(x=105, y=50)
+        
+    def search_data(self):
+        print(self.entry_search.get())
+        self.destroy()
 
 
 class StatFrame(tk.Frame):
@@ -195,18 +238,18 @@ class TableFrame(tk.Frame):
             self.table.column(header, anchor='center')
             self.table.column(header, width=145)
 
-        for row in get_costs(self.master.table_name):
+        for row in get_table(self.master.table_name):
             self.table.insert('', tk.END, values=row)
 
         scroll_pane = ttk.Scrollbar(self, command=self.table.yview)
         self.table.configure(yscrollcommand=scroll_pane.set)
         scroll_pane.pack(side=tk.RIGHT, fill=tk.Y)
         self.table.pack(expand=tk.YES, fill=tk.BOTH)
-        
-        
+
     def delete(self):
         for selection_item in self.table.selection():
-            delete_data(self.master.table_name, self.table.set(selection_item, '#1'))
+            delete_data(self.master.table_name,
+                        self.table.set(selection_item, '#1'))
 
 
 class DataFrame(tk.Frame):
@@ -220,8 +263,10 @@ class DataFrame(tk.Frame):
         date = self.date_label_value.get()
         date = f'{date[6:10]}-{date[3:5]}-{date[:2]}'
         category_id = self.category_label_value.get()
-        if insert_data(self.master.table_name, amount, date,
-                       get_categories_from_category(category_id,self.master.table_name)):
+        if insert_data(
+                self.master.table_name, amount, date,
+                get_categories_from_category(category_id,
+                                             self.master.table_name)):
             self.master.refresh()
 
     def put_widges(self):
@@ -237,7 +282,8 @@ class DataFrame(tk.Frame):
                                              text='Категория',
                                              font=self.master.font)
         self.category_label_value = ttk.Combobox(self,
-                                                 values=get_categories(self.master.table_name))
+                                                 values=get_categories(
+                                                     self.master.table_name))
         self.btn_send = ttk.Button(self,
                                    text='Отправить',
                                    command=self.get_data)
