@@ -70,8 +70,8 @@ class MainFrame(tk.Toplevel):
     def put_table(self, category):
         self.master.master.table_frame.destroy()
         self.category = category
-        self.table_frame = TableFrame(self, self.table_name, self.category)
-        self.table_frame.place(x=0, y=275)
+        self.table = TableFrame(self.master.master, self.table_name, self.category)
+        self.table.place(x=0, y=275)
 
     def refresh(self):
         all_frames = [f for f in self.children]
