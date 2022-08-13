@@ -53,19 +53,43 @@ def get_columns_name(table_name):
     return lst
 
 
-def get_table(table_name):
+def get_table(table_name, category = None):
+    if category != None:
+        cursor.execute(
+        f'''SELECT {table_name}.id, amount, category, date_of_operation  
+        FROM {table_name}
+        INNER JOIN 
+        {table_name}_categories 
+        ON {table_name}.categories_id = {table_name}_categories.id
+        WHERE category = "{category}" 
+        ORDER BY id''')
+    else:
+        cursor.execute(
+            f'''SELECT {table_name}.id, amount, category, date_of_operation  
+            FROM {table_name}
+            INNER JOIN 
+            {table_name}_categories 
+            ON {table_name}.categories_id = {table_name}_categories.id 
+            ORDER BY id''')
+    result = cursor.fetchall()
+    lst = []
+    for row in result:
+        lst.append(tuple([str(rows) for rows in row]))
+    print(lst)
+    return lst
+
+def search_table(table_name, category):
     cursor.execute(
         f'''SELECT {table_name}.id, amount, category, date_of_operation  
         FROM {table_name}
         INNER JOIN 
         {table_name}_categories 
-        ON {table_name}.categories_id = {table_name}_categories.id 
+        ON {table_name}.categories_id = {table_name}_categories.id
+        WHERE category = "{category}" 
         ORDER BY id''')
     result = cursor.fetchall()
-    lst = []
-    for row in result:
-        lst.append(tuple([str(rows) for rows in row]))
-    return lst
+    print(result)
+
 
 
 def get_sum_amount(table_name):
