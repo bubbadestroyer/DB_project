@@ -1,4 +1,4 @@
-from data_frame import DataFrame
+from data_input_frame import DataInputFrame
 from stat_frame import StatFrame
 from table_frame import TableFrame
 from icons_frame import IconsFrame
@@ -20,7 +20,7 @@ class MainFrame(tk.Toplevel):
         self.table_frame = TableFrame(self)
         self.table_frame.place(x=0, y=275)
         self.icons_frame = IconsFrame(self, self.table_frame).place(x=0, y=0)
-        self.data_frame = DataFrame(self).place(x=0, y=100)
+        self.data_frame = DataInputFrame(self).place(x=0, y=100)
         self.stat_frame = StatFrame(self).place(x=300, y=100)
 
     def put_table(self, category):

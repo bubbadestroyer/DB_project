@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 
 
-class DataFrame(tk.Frame):
+class DataInputFrame(tk.Frame):
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -34,6 +34,7 @@ class DataFrame(tk.Frame):
                                              text='Категория',
                                              font=self.master.font)
         self.category_label_value = ttk.Combobox(self,
+                                                 state='readonly',
                                                  values=get_categories(
                                                      self.master.table_name))
         self.btn_send = ttk.Button(self,
