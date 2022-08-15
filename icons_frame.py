@@ -1,5 +1,5 @@
 import tkinter as tk
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from database import *
 from search_frame import SearchFrame
 
@@ -41,6 +41,15 @@ class IconsFrame(tk.Frame):
                                 bd=0,
                                 command=self.create_diagram)
         btn_diagram.pack(side=tk.LEFT)
+        
+        self.refresh_img = tk.PhotoImage(file='./images/refresh.gif')
+        btn_refresh = tk.Button(self.frame,
+                                text='Обновить таблицу',
+                                compound=tk.TOP,
+                                image=self.refresh_img,
+                                bd=0,
+                                command=self.master.refresh)
+        btn_refresh.pack(side=tk.LEFT)
 
     def create_diagram(self):
         fig = plt.figure(figsize=(7, 3))
