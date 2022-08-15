@@ -9,23 +9,39 @@ class DataInputFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.put_widges()
+        self.style = ttk.Style()
+        self.style.configure('ErrorLabel.TLabel',foreground ='red')
 
     def get_data(self):
         amount = self.amount_label_value.get()
         date = self.date_label_value.get()
         date = f'{date[6:10]}-{date[3:5]}-{date[:2]}'
         category_id = self.category_label_value.get()
-        if insert_data(
-                self.master.table_name, amount, date,
-                get_categories_from_category(category_id,
-                                             self.master.table_name)):
+        if category_id == '':
+            self.category_label_text['style'] = 'ErrorLabel.TLabel'
+            self.bell()
+            self.validate_amount(amount)
+        else:
+            insert_data(
+                    self.master.table_name, amount, date,
+                    get_categories_from_category(category_id,
+                                                self.master.table_name))
             self.master.refresh()
+            
+    def validate_amount(self, input):
+        try:
+            x = float(input)
+            return True
+        except ValueError:
+            self.amount_label_text['style'] = 'ErrorLabel.TLabel'
+            self.bell()
+            return False
 
     def put_widges(self):
         self.amount_label_text = ttk.Label(self,
                                            text='Сумма',
                                            font=self.master.font)
-        self.amount_label_value = ttk.Entry(self, justify=tk.RIGHT)
+        self.amount_label_value = ttk.Entry(self, justify=tk.RIGHT,validate='key', validatecommand=(self.register(self.validate_amount),'%P'))
         self.date_label_text = ttk.Label(self,
                                          text='Дата',
                                          font=self.master.font)
