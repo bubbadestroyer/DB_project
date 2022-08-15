@@ -1,4 +1,3 @@
-from multiprocessing import connection
 import mysql.connector
 from mysql.connector import Error
 from config import config
@@ -53,10 +52,10 @@ def get_columns_name(table_name):
     return lst
 
 
-def get_table(table_name, category = None):
+def get_table(table_name, category=None):
     if category != None:
         cursor.execute(
-        f'''SELECT {table_name}.id, amount, category, date_of_operation  
+            f'''SELECT {table_name}.id, amount, category, date_of_operation  
         FROM {table_name}
         INNER JOIN 
         {table_name}_categories 
@@ -75,21 +74,7 @@ def get_table(table_name, category = None):
     lst = []
     for row in result:
         lst.append(tuple([str(rows) for rows in row]))
-    print(lst)
     return lst
-
-def search_table(table_name, category):
-    cursor.execute(
-        f'''SELECT {table_name}.id, amount, category, date_of_operation  
-        FROM {table_name}
-        INNER JOIN 
-        {table_name}_categories 
-        ON {table_name}.categories_id = {table_name}_categories.id
-        WHERE category = "{category}" 
-        ORDER BY id''')
-    result = cursor.fetchall()
-    print(result)
-
 
 
 def get_sum_amount(table_name):
@@ -138,4 +123,3 @@ def delete_data(table_name, id):
 conn = connect_to_sql(config['host'], config['username'], config['password'],
                       config['name_database'])
 cursor = conn.cursor(buffered=True)
-

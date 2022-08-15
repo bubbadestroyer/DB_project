@@ -1,8 +1,8 @@
 from database import *
 import tkinter as tk
 from tkinter import ttk
-from database import *
 from tkcalendar import DateEntry
+
 
 class DataFrame(tk.Frame):
 
