@@ -35,5 +35,6 @@ class SearchFrame(tk.Toplevel):
     def search_data(self):
         from main_frame import MainFrame
         self.category = self.category_combobox.get()
-        MainFrame.put_table(self, self.category)
+        MainFrame.put_table_frame(self, self.category)
+        MainFrame.put_stat_frame(self,self.category)
         self.destroy()

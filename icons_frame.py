@@ -41,7 +41,7 @@ class IconsFrame(tk.Frame):
                                 bd=0,
                                 command=self.create_diagram)
         btn_diagram.pack(side=tk.LEFT)
-        
+
         self.refresh_img = tk.PhotoImage(file='./images/refresh.gif')
         btn_refresh = tk.Button(self.frame,
                                 text='Обновить таблицу',

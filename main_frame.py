@@ -4,6 +4,7 @@ from table_frame import TableFrame
 from icons_frame import IconsFrame
 import tkinter as tk
 
+
 class MainFrame(tk.Toplevel):
 
     def __init__(self, parent, flag):
@@ -18,16 +19,29 @@ class MainFrame(tk.Toplevel):
 
     def put_frames(self):
         self.table_frame = TableFrame(self)
+        self.icons_frame = IconsFrame(self, self.table_frame)
+        self.data_frame = DataInputFrame(self)
+        self.stat_frame = StatFrame(self)
+        
+        
         self.table_frame.place(x=0, y=275)
-        self.icons_frame = IconsFrame(self, self.table_frame).place(x=0, y=0)
-        self.data_frame = DataInputFrame(self).place(x=0, y=100)
-        self.stat_frame = StatFrame(self).place(x=300, y=100)
+        self.icons_frame.place(x=0, y=0)
+        self.data_frame.place(x=0, y=100)
+        self.stat_frame.place(x=300, y=100)
 
-    def put_table(self, category):
+    def put_table_frame(self, category):
         self.master.master.table_frame.destroy()
         self.category = category
-        self.table = TableFrame(self.master.master, self.table_name, self.category)
-        self.table.place(x=0, y=275)
+        self.table_frame = TableFrame(self.master.master, self.table_name,
+                                self.category)
+        self.table_frame.place(x=0, y=275)
+        
+    def put_stat_frame(self, category):
+        self.master.master.stat_frame.destroy()
+        self.category = category
+        self.stat_frame = StatFrame(self.master.master, self.table_name,
+                                self.category, flag = True)
+        self.stat_frame.place(x=300, y=100)
 
     def refresh(self):
         all_frames = [f for f in self.children]

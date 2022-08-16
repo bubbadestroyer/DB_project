@@ -5,14 +5,15 @@ from tkinter import ttk
 
 class TableFrame(tk.Frame):
 
-    def __init__(self, parent, table_name = None, category = None):
+    def __init__(self, parent, table_name=None, category=None):
         super().__init__(parent)
         self.table_name = table_name
         self.category = category
         self.put_widges()
 
     def put_widges(self):
-        heads = get_columns_name(self.table_name if self.table_name != None else self.master.table_name)
+        heads = get_columns_name(self.table_name if self.table_name != None
+                                 else self.master.table_name)
         self.table = ttk.Treeview(self, show='headings')
         self.table['columns'] = heads
 

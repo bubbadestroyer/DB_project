@@ -77,12 +77,36 @@ def get_table(table_name, category=None):
     return lst
 
 
-def get_sum_amount(table_name):
+def get_sum_amount_by_category(table_name):
     cursor.execute(f'''SELECT SUM(amount) 
                    FROM {table_name}''')
     result = cursor.fetchall()
-    return result[0][0]
+    if result[0][0] != None:
+        return result[0][0]
 
+
+def get_sum_avg_amount(table_name, flag = None, category = None):
+    if flag:
+        cursor.execute(f'''SELECT SUM(amount) 
+                    FROM {table_name}
+                    INNER JOIN {table_name}_categories 
+                    ON {table_name}.categories_id = {table_name}_categories.id
+                    WHERE category = "{category}"  
+                    UNION ALL
+                    SELECT ROUND(AVG(amount),2) 
+                    FROM {table_name}
+                    INNER JOIN {table_name}_categories 
+                    ON {table_name}.categories_id = {table_name}_categories.id
+                    WHERE category = "{category}"''')
+        result = cursor.fetchall()
+    else:
+        cursor.execute(f'''SELECT SUM(amount) 
+                    FROM {table_name} 
+                    UNION ALL
+                    SELECT ROUND(AVG(amount),2) 
+                    FROM {table_name}''')
+        result = cursor.fetchall()
+    return result
 
 def get_most_popular_category(table_name):
     cursor.execute(f'''SELECT category 
@@ -93,14 +117,8 @@ def get_most_popular_category(table_name):
                     ORDER BY COUNT(*) DESC 
                     LIMIT 1''')
     result = cursor.fetchall()
-    return result[0][0]
-
-
-def get_avg_amount(table_name):
-    cursor.execute(f'''SELECT ROUND(AVG(amount),2) 
-                   FROM {table_name}''')
-    result = cursor.fetchall()
-    return result[0][0]
+    if result != []:
+        return result[0][0]
 
 
 def get_data_for_diagramm(table_name):
