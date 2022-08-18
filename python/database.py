@@ -3,11 +3,12 @@ from mysql.connector import Error
 from config import config
 
 
-def connect_to_sql(hostname, username, password, name):
+def connect_to_sql(hostname, username, password, name, port):
     try:
         connection_db = mysql.connector.connect(host=hostname,
                                                 user=username,
                                                 passwd=password,
+                                                port=port,
                                                 database=name)
         print('Соединение установлено')
     except Error as err:
@@ -139,5 +140,5 @@ def delete_data(table_name, id):
 
 
 conn = connect_to_sql(config['host'], config['username'], config['password'],
-                      config['name_database'])
+                      config['name_database'], config['port'])
 cursor = conn.cursor(buffered=True)
